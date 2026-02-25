@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProTrade Signals</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1e1e1e, #252525);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+    }
+
+    header img.logo {
+        width: 120px;
+        border-radius: 20%;
+        box-shadow: 0 0 15px #00ccff;
+        margin-bottom: 10px;
+    }
+
+    header h1 {
+        font-size: 2em;
+        letter-spacing: 1px;
+        margin: 0;
+        color: #00ccff;
+    }
+
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    select, button {
+        padding: 12px 18px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        transition: 0.2s;
+    }
+
+    select { background: #333; color: #fff; }
+    select:focus { box-shadow: 0 0 10px #00ccff; }
+    button { background: #00ccff; color: #000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #00ffea; }
+
+    #loading { font-size: 1.5em; color: #ffcc00; margin-top: 20px; display: none; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    #signalDisplay {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-top: 30px;
+        text-align: center;
+        width: 200px;
+        height: 120px;
+        border-radius: 20px;
+        border: 5px solid #00ccff;
+        box-shadow: 0 0 20px rgba(0,204,255,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        overflow: hidden;
+        word-break: break-word;
+        padding: 10px;
+        box-sizing: border-box;
+        background: #111;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .up { color: #00ff00; border-color: #00ff00; box-shadow: 0 0 25px #00ff00; }
+    .down { color: #ff4c4c; border-color: #ff4c4c; box-shadow: 0 0 25px #ff4c4c; }
+
+    #signalInfo { margin-top:10px; font-size:1.2em; text-align: center; letter-spacing: 0.5px; }
+
+    #countdown { width: 80%; height: 15px; background: #333; border-radius: 10px; margin-top: 20px; overflow: hidden; }
+    #countdownProgress { height: 100%; width: 0%; background: #00ccff; transition: width 1s linear; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <!-- Your logo -->
+    <img src="https://i.postimg.cc/PJmgyPrG/file-00000000b81c72068fdd76155da74af6.png" alt="ProTrade Signals Logo" class="logo">
+    <h1>ProTrade Signals</h1>
+</header>
+
+<div class="controls">
+    <select id="broker">
+        <option>Quotex</option>
+        <option>Binomo</option>
+        <option>Olymp Trade</option>
+        <option>IQ Option</option>
+        <option>Pocket Option</option>
+    </select>
+
+    <select id="pair">
+        <option>EUR/USD</option>
+        <option>USD/PKR</option>
+        <option>USD/BRL</option>
+        <option>USD/BTC</option>
+        <option>USD/DZD</option>
+        <option>USD/INR</option>
+        <option>USD/EGP</option>
+        <option>USD/PHP</option>
+        <option>USD/COP</option>
+        <option>USD/NGN</option>
+        <option>USD/JPY</option>
+        <option>USD/MXN</option>
+    </select>
+
+    <select id="duration">
+        <option>5s</option>
+        <option>15s</option>
+        <option>30s</option>
+        <option>1m</option>
+        <option>2m</option>
+        <option>3m</option>
+        <option>5m</option>
+    </select>
+
+    <button id="getSignal">Get Signal</button>
+</div>
+
+<div id="loading">Generating Signal...</div>
+<div id="signalDisplay">—</div>
+<div id="signalInfo"></div>
+
+<div id="countdown">
+    <div id="countdownProgress"></div>
+</div>
+
+<script>
+const cooldowns = {};
+
+document.getElementById("getSignal").addEventListener("click", () => {
+    const broker = document.getElementById("broker").value;
+    const pair = document.getElementById("pair").value;
+    const duration = document.getElementById("duration").value;
+
+    if(cooldowns[duration]) {
+        alert(`Wait! Signal for ${duration} is still active.`);
+        return;
+    }
+
+    const loadingEl = document.getElementById("loading");
+    const displayEl = document.getElementById("signalDisplay");
+    const infoEl = document.getElementById("signalInfo");
+    const countdownProgress = document.getElementById("countdownProgress");
+
+    loadingEl.style.display = "block";
+    displayEl.textContent = "—";
+    displayEl.className = "";
+    infoEl.textContent = "";
+    countdownProgress.style.width = "0%";
+
+    setTimeout(() => {
+        const signals = ["UP", "DOWN"];
+        const signal = signals[Math.floor(Math.random() * signals.length)];
+        
+        displayEl.textContent = `Signal: ${signal}`;
+        displayEl.className = signal.toLowerCase();
+        infoEl.textContent = `Broker: ${broker} | Pair: ${pair} | Duration: ${duration}`;
+        loadingEl.style.display = "none";
+
+        let ms = 60000;
+        if(duration.endsWith("s")) ms = parseInt(duration) * 1000;
+        if(duration.endsWith("m")) ms = parseInt(duration) * 60 * 1000;
+
+        cooldowns[duration] = true;
+        let secondsLeft = ms / 1000;
+        const totalSeconds = secondsLeft;
+
+        const timer = setInterval(() => {
+            secondsLeft--;
+            const progressPercent = ((totalSeconds - secondsLeft) / totalSeconds) * 100;
+            countdownProgress.style.width = progressPercent + "%";
+
+            if(secondsLeft <= 0) {
+                clearInterval(timer);
+                countdownProgress.style.width = "0%";
+                cooldowns[duration] = false;
+            }
+        }, 1000);
+    }, 2000);
+});
+</script>
+
+</body>
+</html>
