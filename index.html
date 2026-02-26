@@ -3,234 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IB Signal Pro</title>
-
+<title>ProTrade Signals</title>
 <style>
-body{
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:linear-gradient(135deg,#0f172a,#1e293b);
-    color:white;
-    text-align:center;
-}
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1e1e1e, #252525);
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
 
-header{
-    padding:20px;
-}
+    header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+    }
 
-.logo{
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    background:linear-gradient(135deg,#38bdf8,#0ea5e9);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:40px;
-    font-weight:bold;
-    margin:0 auto 10px;
-    box-shadow:0 0 20px rgba(56,189,248,0.6);
-}
+    header img.logo {
+        width: 120px;
+        border-radius: 20%;
+        box-shadow: 0 0 15px #00ccff;
+        margin-bottom: 10px;
+    }
 
-h1{
-    color:#38bdf8;
-    margin:5px 0;
-}
+    header h1 {
+        font-size: 2em;
+        letter-spacing: 1px;
+        margin: 0;
+        color: #00ccff;
+    }
 
-.controls{
-    margin-top:15px;
-}
+    .controls {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
 
-select,button{
-    padding:10px;
-    margin:5px;
-    border-radius:8px;
-    border:none;
-    font-size:14px;
-}
+    select, button {
+        padding: 12px 18px;
+        font-size: 16px;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+        transition: 0.2s;
+    }
 
-select{
-    background:#334155;
-    color:white;
-}
+    select { background: #333; color: #fff; }
+    select:focus { box-shadow: 0 0 10px #00ccff; }
+    button { background: #00ccff; color: #000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #00ffea; }
 
-button{
-    background:#38bdf8;
-    color:black;
-    font-weight:bold;
-    cursor:pointer;
-}
+    #loading { font-size: 1.5em; color: #ffcc00; margin-top: 20px; display: none; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-button:hover{
-    background:#0ea5e9;
-}
+    #signalDisplay {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-top: 30px;
+        text-align: center;
+        width: 200px;
+        height: 120px;
+        border-radius: 20px;
+        border: 5px solid #00ccff;
+        box-shadow: 0 0 20px rgba(0,204,255,0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        overflow: hidden;
+        word-break: break-word;
+        padding: 10px;
+        box-sizing: border-box;
+        background: #111;
+        transition: all 0.3s ease-in-out;
+    }
 
-#loading{
-    margin-top:15px;
-    display:none;
-    color:#facc15;
-    font-weight:bold;
-}
+    .up { color: #00ff00; border-color: #00ff00; box-shadow: 0 0 25px #00ff00; }
+    .down { color: #ff4c4c; border-color: #ff4c4c; box-shadow: 0 0 25px #ff4c4c; }
 
-#signalBox{
-    margin:20px auto;
-    width:260px;
-    height:120px;
-    border-radius:20px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:26px;
-    font-weight:bold;
-    background:#0f172a;
-    border:4px solid #38bdf8;
-    transition:0.3s;
-}
+    #signalInfo { margin-top:10px; font-size:1.2em; text-align: center; letter-spacing: 0.5px; }
 
-.up{
-    color:#22c55e;
-    border-color:#22c55e;
-}
+    #countdown { width: 80%; height: 15px; background: #333; border-radius: 10px; margin-top: 20px; overflow: hidden; }
+    #countdownProgress { height: 100%; width: 0%; background: #00ccff; transition: width 1s linear; }
 
-.down{
-    color:#ef4444;
-    border-color:#ef4444;
-}
-
-#info{
-    margin-top:10px;
-    font-size:14px;
-    color:#cbd5e1;
-}
-
-#countdown{
-    margin:20px auto;
-    width:80%;
-    height:10px;
-    background:#334155;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-#progress{
-    height:100%;
-    width:0%;
-    background:#38bdf8;
-}
 </style>
 </head>
 <body>
 
 <header>
-<div class="logo">IB</div>
-<h1>IB Signal Pro</h1>
+    <!-- Logo using your direct URL -->
+    <img src="https://i.postimg.cc/PJmgyPrG/file-00000000b81c72068fdd76155da74af6.png" alt="ProTrade Signals Logo" class="logo">
+    <h1>ProTrade Signals</h1>
 </header>
 
 <div class="controls">
+    <select id="broker">
+        <option>Quotex</option>
+        <option>Binomo</option>
+        <option>Olymp Trade</option>
+        <option>IQ Option</option>
+        <option>Pocket Option</option>
+    </select>
 
-<select id="broker">
-<option>Quotex</option>
-<option>Binomo</option>
-<option>Olymp Trade</option>
-<option>IQ Option</option>
-<option>Pocket Option</option>
-</select>
+    <select id="pair">
+        <option>EUR/USD</option>
+        <option>USD/PKR</option>
+        <option>USD/BRL</option>
+        <option>USD/BTC</option>
+        <option>USD/DZD</option>
+        <option>USD/INR</option>
+        <option>USD/EGP</option>
+        <option>USD/PHP</option>
+        <option>USD/COP</option>
+        <option>USD/NGN</option>
+        <option>USD/JPY</option>
+        <option>USD/MXN</option>
+    </select>
 
-<select id="pair">
-<option>EUR/USD OTC</option>
-<option>USD/PKR OTC</option>
-<option>USD/BRL OTC</option>
-<option>USD/BDT OTC</option>
-<option>USD/DZD OTC</option>
-<option>USD/INR OTC</option>
-<option>USD/EGP OTC</option>
-<option>USD/PHP OTC</option>
-<option>USD/COP OTC</option>
-<option>USD/NGN OTC</option>
-<option>USD/JPY OTC</option>
-<option>USD/MXN OTC</option>
-</select>
+    <select id="duration">
+        <option>5s</option>
+        <option>15s</option>
+        <option>30s</option>
+        <option>1m</option>
+        <option>2m</option>
+        <option>3m</option>
+        <option>5m</option>
+    </select>
 
-<select id="duration">
-<option>5s</option>
-<option>15s</option>
-<option>30s</option>
-<option>1m</option>
-<option>2m</option>
-<option>3m</option>
-<option>5m</option>
-</select>
-
-<button onclick="generateSignal()">Get Signal</button>
-
+    <button id="getSignal">Get Signal</button>
 </div>
 
 <div id="loading">Generating Signal...</div>
+<div id="signalDisplay">—</div>
+<div id="signalInfo"></div>
 
-<div id="signalBox">---</div>
-<div id="info"></div>
-
-<div id="countdown"><div id="progress"></div></div>
+<div id="countdown">
+    <div id="countdownProgress"></div>
+</div>
 
 <script>
+const cooldowns = {};
 
-let cooldown=false;
+document.getElementById("getSignal").addEventListener("click", () => {
+    const broker = document.getElementById("broker").value;
+    const pair = document.getElementById("pair").value;
+    const duration = document.getElementById("duration").value;
 
-function generateSignal(){
+    if(cooldowns[duration]) {
+        alert(`Wait! Signal for ${duration} is still active.`);
+        return;
+    }
 
-if(cooldown){
-alert("Wait for current signal to finish.");
-return;
-}
+    const loadingEl = document.getElementById("loading");
+    const displayEl = document.getElementById("signalDisplay");
+    const infoEl = document.getElementById("signalInfo");
+    const countdownProgress = document.getElementById("countdownProgress");
 
-const broker=document.getElementById("broker").value;
-const pair=document.getElementById("pair").value;
-const duration=document.getElementById("duration").value;
+    // Show loading
+    loadingEl.style.display = "block";
+    displayEl.textContent = "—";
+    displayEl.className = "";
+    infoEl.textContent = "";
+    countdownProgress.style.width = "0%";
 
-document.getElementById("loading").style.display="block";
-document.getElementById("signalBox").innerHTML="---";
-document.getElementById("signalBox").className="";
-document.getElementById("info").innerHTML="";
-document.getElementById("progress").style.width="0%";
+    setTimeout(() => {
+        // Random UP/DOWN
+        const signals = ["UP", "DOWN"];
+        const signal = signals[Math.floor(Math.random() * signals.length)];
+        
+        displayEl.textContent = `Signal: ${signal}`;
+        displayEl.className = signal.toLowerCase();
+        infoEl.textContent = `Broker: ${broker} | Pair: ${pair} | Duration: ${duration}`;
+        loadingEl.style.display = "none";
 
-setTimeout(()=>{
+        // Set cooldown
+        let ms = 60000;
+        if(duration.endsWith("s")) ms = parseInt(duration) * 1000;
+        if(duration.endsWith("m")) ms = parseInt(duration) * 60 * 1000;
 
-const signal=Math.random()>0.5?"Up":"Down";
-const box=document.getElementById("signalBox");
+        cooldowns[duration] = true;
+        let secondsLeft = ms / 1000;
+        const totalSeconds = secondsLeft;
 
-box.innerHTML="Signal: "+signal;
-box.className=signal.toLowerCase();
+        const timer = setInterval(() => {
+            secondsLeft--;
+            const progressPercent = ((totalSeconds - secondsLeft) / totalSeconds) * 100;
+            countdownProgress.style.width = progressPercent + "%";
 
-document.getElementById("info").innerHTML=
-"Broker: "+broker+" | Pair: "+pair+" | Time: "+duration;
-
-document.getElementById("loading").style.display="none";
-
-let seconds=duration.includes("m")?
-parseInt(duration)*60:
-parseInt(duration);
-
-cooldown=true;
-let total=seconds;
-
-let interval=setInterval(()=>{
-
-seconds--;
-let percent=((total-seconds)/total)*100;
-document.getElementById("progress").style.width=percent+"%";
-
-if(seconds<=0){
-clearInterval(interval);
-cooldown=false;
-document.getElementById("progress").style.width="0%";
-}
-
-},1000);
-
-},1500);
-
-}
-
+            if(secondsLeft <= 0) {
+                clearInterval(timer);
+                countdownProgress.style.width = "0%";
+                cooldowns[duration] = false;
+            }
+        }, 1000);
+    }, 2000);
+});
 </script>
 
 </body>
