@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IB Signals Pro</title>
-
 <style>
 body{
     margin:0;
@@ -14,24 +13,31 @@ body{
     text-align:center;
 }
 
+/* Header and Logo */
 header{
     padding:25px 10px;
 }
 
-/* Logo Image */
 .logo{
     width:120px;
     height:120px;
     margin:0 auto 15px;
     display:block;
     border-radius:50%;
-    box-shadow:0 0 25px rgba(56,189,248,0.8);
+    box-shadow:0 0 25px #38bdf8;
+    animation: glow 2s infinite alternate;
 }
 
-/* Title */
+@keyframes glow{
+    0% { box-shadow:0 0 10px #38bdf8, 0 0 20px #0ea5e9;}
+    50% { box-shadow:0 0 20px #38bdf8, 0 0 30px #0ea5e9;}
+    100% { box-shadow:0 0 25px #38bdf8, 0 0 40px #0ea5e9;}
+}
+
 h1{
     margin:5px 0;
     color:#38bdf8;
+    text-shadow:0 0 8px #38bdf8;
 }
 
 /* Controls */
@@ -57,6 +63,7 @@ button{
     color:black;
     font-weight:bold;
     cursor:pointer;
+    transition:0.3s;
 }
 
 button:hover{
@@ -84,7 +91,8 @@ button:hover{
     font-weight:bold;
     background:#0f172a;
     border:4px solid #38bdf8;
-    transition:0.3s;
+    transition:0.5s;
+    opacity:0;
 }
 
 .up{
@@ -97,6 +105,15 @@ button:hover{
     border-color:#ef4444;
 }
 
+/* fade in animation */
+.fade-in{
+    animation: fadeIn 0.8s forwards;
+}
+@keyframes fadeIn{
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
 #info{
     margin-top:10px;
     font-size:14px;
@@ -107,16 +124,19 @@ button:hover{
 #countdown{
     margin:20px auto;
     width:80%;
-    height:10px;
+    height:12px;
     background:#334155;
     border-radius:10px;
     overflow:hidden;
+    box-shadow:0 0 10px #38bdf8;
 }
 
 #progress{
     height:100%;
     width:0%;
     background:#38bdf8;
+    box-shadow:0 0 8px #0ea5e9;
+    transition:width 0.05s linear;
 }
 </style>
 </head>
@@ -128,7 +148,6 @@ button:hover{
 </header>
 
 <div class="controls">
-
 <select id="broker">
 <option>Quotex</option>
 <option>Binomo</option>
@@ -163,7 +182,6 @@ button:hover{
 </select>
 
 <button onclick="generateSignal()">Get Signal</button>
-
 </div>
 
 <div id="loading">Generating Signal...</div>
@@ -189,18 +207,17 @@ function generateSignal(){
     const duration=document.getElementById("duration").value;
 
     document.getElementById("loading").style.display="block";
-    document.getElementById("signalBox").innerHTML="---";
-    document.getElementById("signalBox").className="";
+    const box=document.getElementById("signalBox");
+    box.innerHTML="---";
+    box.className="";
     document.getElementById("info").innerHTML="";
     document.getElementById("progress").style.width="0%";
+    box.style.opacity=0;
 
     setTimeout(()=>{
-
         const signal=Math.random()>0.5?"Up":"Down";
-        const box=document.getElementById("signalBox");
-
         box.innerHTML="Signal: "+signal;
-        box.className=signal.toLowerCase();
+        box.className=signal.toLowerCase()+" fade-in";
 
         document.getElementById("info").innerHTML=
         "Broker: "+broker+" | Pair: "+pair+" | Time: "+duration;
@@ -214,7 +231,7 @@ function generateSignal(){
         const progressBar = document.getElementById("progress");
 
         let interval = setInterval(()=>{
-            let elapsed = (Date.now() - startTime) / 1000; // elapsed in seconds
+            let elapsed = (Date.now() - startTime) / 1000; 
             let percent = Math.min((elapsed / totalSeconds) * 100, 100);
             progressBar.style.width = percent + "%";
 
@@ -222,9 +239,10 @@ function generateSignal(){
                 clearInterval(interval);
                 cooldown=false;
                 progressBar.style.width="0%";
+                box.style.opacity=0;
             }
 
-        }, 50); // update every 50ms for smooth animation
+        }, 50);
 
     },1500);
 
